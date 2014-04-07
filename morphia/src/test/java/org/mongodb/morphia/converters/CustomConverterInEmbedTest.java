@@ -112,6 +112,58 @@ public class CustomConverterInEmbedTest extends TestBase {
     @Converters(ComplexFooConverter.class)
     public static class ComplexBar extends TestEntity {
         private ComplexFoo foo;
+
+        public ComplexFoo getFoo() {
+            return foo;
+        }
+
+        public void setFoo(ComplexFoo foo) {
+            this.foo = foo;
+        }
+    }
+
+    public static class ChildClass {
+        private String field1;
+
+        public ChildClass() {
+        }
+
+        public ChildClass(String field1) {
+            this.field1 = field1;
+        }
+
+        public String getField1() {
+            return field1;
+        }
+
+        public void setField1(String field1) {
+            this.field1 = field1;
+        }
+    }
+
+    /**
+     * A type that contains a complex custom type, represented as an object.
+     *
+     * @author Christian Trimble
+     */
+    @Converters(ChildClassConverter.class)
+    public static class ComplexBarChild extends ComplexBar {
+        private ChildClass bar;
+
+        public ComplexBarChild() {
+        }
+
+        public ComplexBarChild(ChildClass bar) {
+            this.bar = bar;
+        }
+
+        public ChildClass getBar() {
+            return bar;
+        }
+
+        public void setBar(ChildClass bar) {
+            this.bar = bar;
+        }
     }
 
     /**
@@ -228,6 +280,33 @@ public class CustomConverterInEmbedTest extends TestBase {
         }
     }
 
+    /**
+     * A converter that does not implement SimpleValueConverter and converts ComplexFoo into an object type.
+     *
+     * @author Christian Trimble
+     */
+    public static class ChildClassConverter extends TypeConverter {
+        public ChildClassConverter() {
+            super(ChildClass.class);
+        }
+
+        @Override
+        public Object decode(final Class targetClass, final Object fromDBObject, final MappedField optionalExtraInfo) {
+            DBObject dbObject = (DBObject) fromDBObject;
+            ChildClass childClass = new ChildClass();
+            childClass.field1 = (String) dbObject.get("x");
+            return childClass;
+        }
+
+        @Override
+        public Object encode(final Object value, final MappedField optionalExtraInfo) {
+            ChildClass child = (ChildClass) value;
+            BasicDBObject dbObject = new BasicDBObject();
+            dbObject.put("x", child.field1);
+            return dbObject;
+        }
+    }
+
     @Test
     public void testEmbeddedComplexType() throws Exception {
         ComplexBar bar = new ComplexBar();
@@ -239,6 +318,26 @@ public class CustomConverterInEmbedTest extends TestBase {
         assertThat("foo is not null", fromDb.foo, notNullValue());
         assertThat("foo has the correct first value", fromDb.foo.first(), equalTo("firstValue"));
         assertThat("foo has the correct second value", fromDb.foo.second(), equalTo("secondValue"));
+    }
+
+    /**
+     * Tests that converters are gathered from all classes in the hierarchy, instead of only the topmost.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testChildClassConverters() throws Exception {
+        ComplexBarChild bar = new ComplexBarChild();
+        bar.setFoo(new ComplexFoo("firstValue", "secondValue"));
+        bar.setBar(new ChildClass("qzr"));
+        getDs().save(bar);
+
+        ComplexBarChild fromDb = getDs().find(ComplexBarChild.class).disableValidation().field("bar.x").equal("qzr").get();
+        assertThat("bar is not null", fromDb, notNullValue());
+        assertThat("foo is not null", fromDb.getFoo(), notNullValue());
+        assertThat("foo has the correct first value", fromDb.getFoo().first(), equalTo("firstValue"));
+        assertThat("foo has the correct second value", fromDb.getFoo().second(), equalTo("secondValue"));
+        assertThat("bar has the correct value", fromDb.getBar().getField1(), equalTo("qzr"));
     }
 
     @Test
