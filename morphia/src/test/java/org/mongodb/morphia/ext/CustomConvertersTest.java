@@ -260,12 +260,16 @@ public class CustomConvertersTest extends TestBase {
     /**
      * This test is green when {@link MyEntity#a} is annotated with {@code @Property}, as in this case the field is not serialized at all.
      * However, the bson encoder would fail to encode the object of type A (as shown by {@link #testFullBSONSerialization()}).
+     *
+     * NOTE: I changed this test.  Originally the logic of annotation handling in Mapper ignored that fact that the subclass
+     * also specified a converter.  This doesn't seem like expected behavior to me, so I changed this test to use the result
+     * of the custom converter that is now being returned.
      */
     @Test
     public void testDBObjectSerialization() {
         final MyEntity entity = new MyEntity(1L, new A(2L));
         final DBObject dbObject = getMorphia().toDBObject(entity);
-        assertEquals(new BasicDBObject("_id", 1L).append("a", new BasicDBObject("value", 2)), dbObject);
+        assertEquals(new BasicDBObject("_id", 1L).append("a", 2), dbObject);
         assertEquals(entity, getMorphia().fromDBObject(MyEntity.class, dbObject));
     }
 
