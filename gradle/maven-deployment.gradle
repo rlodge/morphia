@@ -34,18 +34,18 @@ configure(subprojects) {
                 password: project.properties.nexusPassword
             ]
 
-            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
+            snapshotRepository(url: 'http://whcinxconskys01.corp.web/nexus/content/repositories/snapshots') {
                 authentication(nexusCredentials)
             }
-            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+            repository(url: 'http://whcinxconskys01.corp.web/nexus/content/repositories/releases') {
                 authentication(nexusCredentials)
             }
         }
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-            }
-        }
+//        repositories {
+//            mavenDeployer {
+//                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+//            }
+//        }
     }
 
     modifyPom {
@@ -80,4 +80,13 @@ configure(subprojects) {
             resultPom.dependencies*.scope = null
         }
     }
+
+	nexus {
+		attachSources = true
+		attachTests = false
+		attachJavadoc = true
+		sign = false
+		repositoryUrl = 'http://whcinxconskys01.corp.web/nexus/content/repositories/releases'
+		snapshotRepositoryUrl = 'http://whcinxconskys01.corp.web/nexus/content/repositories/snapshots'
+	}
 }
