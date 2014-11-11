@@ -172,13 +172,13 @@ public class Mapper {
 
         final List<Annotation> c = mc.getAnnotations(Converters.class);
         if (c != null) {
-	        for (Annotation annotation : c) {
-		        for (final Class<? extends TypeConverter> clazz : ((Converters)annotation).value()) {
-			        if (!getConverters().isRegistered(clazz)) {
-				        getConverters().addConverter(clazz);
-			        }
-		        }
-	        }
+            for (Annotation annotation : c) {
+                for (final Class<? extends TypeConverter> clazz : ((Converters) annotation).value()) {
+                    if (!getConverters().isRegistered(clazz)) {
+                        getConverters().addConverter(clazz);
+                    }
+                }
+            }
         }
 
         mappedClasses.put(mc.getClazz().getName(), mc);

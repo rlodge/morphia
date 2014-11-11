@@ -62,20 +62,20 @@ public class ReflectionUtilsTest extends TestBase {
         Assert.assertEquals(Author.class, ReflectionUtils.getParameterizedClass(WritingTeam.class));
     }
 
-	/**
-	 * Tests that in a class hierarchy of arbitrary depth, we can get the correct declared field type
-	 *
-	 * @throws Exception
-	 */
-	@Test
-	public void testGenericFieldTypeResolution() throws Exception {
-		Assert.assertEquals(
-			Integer.class,
-			ReflectionUtils.getTypeArgument(Sub.class,
-				(TypeVariable) Super1.class.getDeclaredField("field").getGenericType()
-			)
-		);
-	}
+    /**
+     * Tests that in a class hierarchy of arbitrary depth, we can get the correct declared field type
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testGenericFieldTypeResolution() throws Exception {
+        Assert.assertEquals(
+            Integer.class,
+            ReflectionUtils.getTypeArgument(Sub.class,
+                (TypeVariable) Super1.class.getDeclaredField("field").getGenericType()
+            )
+        );
+    }
 
     @Entity("Base")
     @Indexes(@Index("id"))
@@ -110,17 +110,25 @@ public class ReflectionUtilsTest extends TestBase {
         private Set<Author> authorsSet;
     }
 
-	private static class Super1<T extends Object> {
-		protected T field;
-	}
+    private static class Super1<T extends Object> {
+        private T field;
 
-	private static class Super2<T extends Serializable> extends Super1<T> {
-	}
+        public T getField() {
+            return field;
+        }
 
-	private static class Super3<T extends Number> extends Super2<T> {
-	}
+        public void setField(final T field) {
+            this.field = field;
+        }
+    }
 
-	private static class Sub extends Super3<Integer>{
-	}
+    private static class Super2<T extends Serializable> extends Super1<T> {
+    }
+
+    private static class Super3<T extends Number> extends Super2<T> {
+    }
+
+    private static class Sub extends Super3<Integer> {
+    }
 
 }

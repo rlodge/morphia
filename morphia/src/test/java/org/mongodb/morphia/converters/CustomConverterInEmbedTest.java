@@ -117,7 +117,7 @@ public class CustomConverterInEmbedTest extends TestBase {
             return foo;
         }
 
-        public void setFoo(ComplexFoo foo) {
+        public void setFoo(final ComplexFoo foo) {
             this.foo = foo;
         }
     }
@@ -128,7 +128,7 @@ public class CustomConverterInEmbedTest extends TestBase {
         public ChildClass() {
         }
 
-        public ChildClass(String field1) {
+        public ChildClass(final String field1) {
             this.field1 = field1;
         }
 
@@ -136,7 +136,7 @@ public class CustomConverterInEmbedTest extends TestBase {
             return field1;
         }
 
-        public void setField1(String field1) {
+        public void setField1(final String field1) {
             this.field1 = field1;
         }
     }
@@ -153,7 +153,7 @@ public class CustomConverterInEmbedTest extends TestBase {
         public ComplexBarChild() {
         }
 
-        public ComplexBarChild(ChildClass bar) {
+        public ComplexBarChild(final ChildClass bar) {
             this.bar = bar;
         }
 
@@ -161,7 +161,7 @@ public class CustomConverterInEmbedTest extends TestBase {
             return bar;
         }
 
-        public void setBar(ChildClass bar) {
+        public void setBar(final ChildClass bar) {
             this.bar = bar;
         }
     }
