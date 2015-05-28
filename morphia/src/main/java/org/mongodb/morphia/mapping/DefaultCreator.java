@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -22,6 +23,7 @@ import java.util.Set;
  */
 public class DefaultCreator implements ObjectFactory {
     private static final Logger LOG = MorphiaLoggerFactory.get(DefaultCreator.class);
+    private Map<String, Class> classNameCache = new ConcurrentHashMap<String, Class>();
 
     /* (non-Javadoc)
      * @see org.mongodb.morphia.ObjectFactory#createInstance(java.lang.Class)
@@ -84,7 +86,11 @@ public class DefaultCreator implements ObjectFactory {
             // try to Class.forName(className) as defined in the dbObject first,
             // otherwise return the entityClass
             try {
-                c = Class.forName(className, true, getClassLoaderForClass(className, dbObj));
+                c = classNameCache.get(className);
+                if (c == null) {
+                    c = Class.forName(className, true, getClassLoaderForClass(className, dbObj));
+                    classNameCache.put(className, c);
+                }
             } catch (ClassNotFoundException e) {
                 if (LOG.isWarningEnabled()) {
                     LOG.warning("Class not found defined in dbObj: ", e);
