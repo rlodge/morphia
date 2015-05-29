@@ -34,10 +34,10 @@ configure(subprojects) {
                 password: project.properties.nexusPassword
             ]
 
-            snapshotRepository(url: 'http://whcinxconskys01.corp.web/nexus/content/repositories/snapshots') {
+            snapshotRepository(url: 'http://nexus.cengage.info/content/repositories/analytics-snapshots/') {
                 authentication(nexusCredentials)
             }
-            repository(url: 'http://whcinxconskys01.corp.web/nexus/content/repositories/releases') {
+            repository(url: 'http://nexus.cengage.info/content/repositories/analytics-releases/') {
                 authentication(nexusCredentials)
             }
         }
@@ -86,7 +86,7 @@ configure(subprojects) {
 		attachTests = false
 		attachJavadoc = true
 		sign = false
-		repositoryUrl = 'http://whcinxconskys01.corp.web/nexus/content/repositories/releases'
-		snapshotRepositoryUrl = 'http://whcinxconskys01.corp.web/nexus/content/repositories/snapshots'
+		repositoryUrl = 'http://nexus.cengage.info/content/repositories/analytics-releases/'
+		snapshotRepositoryUrl = 'http://nexus.cengage.info/content/repositories/analytics-snapshots/'
 	}
 }

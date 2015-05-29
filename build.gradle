@@ -4,7 +4,7 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url 'http://nexus.cengage.info/nexus/content/groups/cengage-analytics/' }
         jcenter()
     }
 
@@ -55,7 +55,7 @@ configure(subprojects) {
     repositories {
         mavenCentral()
         mavenLocal()
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url 'http://nexus.cengage.info/nexus/content/groups/cengage-analytics/' }
     }
 
     dependencies {
