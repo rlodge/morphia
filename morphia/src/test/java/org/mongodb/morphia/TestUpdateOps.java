@@ -869,6 +869,37 @@ public class TestUpdateOps extends TestBase {
 
         EntityWithMap found = getDs().get(EntityWithMap.class, entity.id);
         assertEquals(map, found.getSomeMap());
+
+        UpdateOperations<EntityWithMap> ops2 = getDs().createUpdateOperations(EntityWithMap.class);
+        ops2.set("someMap.baz", "bar");
+
+        getDs().updateFirst(
+            getDs().createQuery(EntityWithMap.class).field("_id").equal(entity.id),
+            ops2,
+            false
+        );
+
+        HashMap<String, String> map2 = new HashMap<String, String>();
+        map2.put("baz", "bar");
+
+        EntityWithMap found2 = getDs().get(EntityWithMap.class, entity.id);
+        assertEquals(map2, found2.getSomeMap());
+
+        UpdateOperations<EntityWithMap> ops3 = getDs().createUpdateOperations(EntityWithMap.class);
+        ops3.set("someMap.foo", "qux");
+
+        getDs().updateFirst(
+            getDs().createQuery(EntityWithMap.class).field("_id").equal(entity.id),
+            ops3,
+            false
+        );
+
+        HashMap<String, String> map3 = new HashMap<String, String>();
+        map3.put("baz", "bar");
+        map3.put("foo", "qux");
+
+        EntityWithMap found3 = getDs().get(EntityWithMap.class, entity.id);
+        assertEquals(map3, found3.getSomeMap());
     }
 
     private void assertInserted(final UpdateResults res) {
