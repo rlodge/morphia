@@ -38,6 +38,7 @@ import org.mongodb.morphia.testmodel.Rectangle;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -847,6 +848,60 @@ public class TestUpdateOps extends TestBase {
                        true, WriteConcern.ACKNOWLEDGED);
     }
 
+    @Test
+    public void testUpdateWithMap() {
+        EntityWithMap entity = new EntityWithMap();
+        entity.setSomeMap(new HashMap<String, String>());
+        entity.getSomeMap().put("foo", "bar");
+
+        getDs().save(entity);
+
+        UpdateOperations<EntityWithMap> ops = getDs().createUpdateOperations(EntityWithMap.class);
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("baz", "qux");
+        ops.set("someMap", map);
+
+        getDs().updateFirst(
+            getDs().createQuery(EntityWithMap.class).field("_id").equal(entity.id),
+            ops,
+            false
+        );
+
+        EntityWithMap found = getDs().get(EntityWithMap.class, entity.id);
+        assertEquals(map, found.getSomeMap());
+
+        UpdateOperations<EntityWithMap> ops2 = getDs().createUpdateOperations(EntityWithMap.class);
+        ops2.set("someMap.baz", "bar");
+
+        getDs().updateFirst(
+            getDs().createQuery(EntityWithMap.class).field("_id").equal(entity.id),
+            ops2,
+            false
+        );
+
+        HashMap<String, String> map2 = new HashMap<String, String>();
+        map2.put("baz", "bar");
+
+        EntityWithMap found2 = getDs().get(EntityWithMap.class, entity.id);
+        assertEquals(map2, found2.getSomeMap());
+
+        UpdateOperations<EntityWithMap> ops3 = getDs().createUpdateOperations(EntityWithMap.class);
+        ops3.set("someMap.foo", "qux");
+
+        getDs().updateFirst(
+            getDs().createQuery(EntityWithMap.class).field("_id").equal(entity.id),
+            ops3,
+            false
+        );
+
+        HashMap<String, String> map3 = new HashMap<String, String>();
+        map3.put("baz", "bar");
+        map3.put("foo", "qux");
+
+        EntityWithMap found3 = getDs().get(EntityWithMap.class, entity.id);
+        assertEquals(map3, found3.getSomeMap());
+    }
+
     private void assertInserted(final UpdateResults res) {
         assertThat(res.getInsertedCount(), is(1));
         assertThat(res.getUpdatedCount(), is(0));
@@ -1017,5 +1072,23 @@ public class TestUpdateOps extends TestBase {
         private DumbArrayElement(final String whereId) {
             this.whereId = whereId;
         }
+    }
+
+    @Entity
+    private static class EntityWithMap {
+
+        @Id
+        private ObjectId id;
+
+        private Map<String, String> someMap;
+
+        public Map<String, String> getSomeMap() {
+            return someMap;
+        }
+
+        public void setSomeMap(final Map<String, String> someMap) {
+            this.someMap = someMap;
+        }
+
     }
 }
